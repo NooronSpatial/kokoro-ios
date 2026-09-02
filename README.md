@@ -1,7 +1,7 @@
 > ## Why this fork exists
 >
 > This is a fork of [mlalma/kokoro-ios](https://github.com/mlalma/kokoro-ios)
-> with **one line changed**, so that Kokoro can run in the same Swift package
+> with **two lines changed**, so that Kokoro can run in the same Swift package
 > graph as a model that needs a newer MLX.
 >
 > ```diff
@@ -11,8 +11,18 @@
 >
 > Upstream pins `mlx-swift` to **exactly 0.30.2**. `mlx-swift-lm` (used for
 > on-device language models) requires **0.31.3..<0.32.0**, so SwiftPM refuses
-> any graph containing both — there is no partial route, because `MisakiSwift`
-> carries the same pin.
+> any graph containing both.
+>
+> There is no partial route: `MisakiSwift` carries the same pin, so the G2P
+> drags 0.30.2 back in on its own. That is the **second** changed line — this
+> package now points at
+> [NooronSpatial/MisakiSwift](https://github.com/NooronSpatial/MisakiSwift),
+> the matching fork:
+>
+> ```diff
+> - .package(url: "https://github.com/mlalma/MisakiSwift", exact: "1.0.6"),
+> + .package(url: "https://github.com/NooronSpatial/MisakiSwift", from: "1.1.0"),
+> ```
 >
 > The relaxed range was verified before this fork was made: KokoroSwift,
 > MisakiSwift and MLXUtilsLibrary all build against **mlx-swift 0.31.6 with
