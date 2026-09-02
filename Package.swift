@@ -11,14 +11,13 @@ let package = Package(
   products: [
     .library(
       name: "KokoroSwift",
-      type: .dynamic,
       targets: ["KokoroSwift"]
     ),
   ],
   dependencies: [
     .package(url: "https://github.com/ml-explore/mlx-swift", from: "0.30.2"),
     // .package(url: "https://github.com/mlalma/eSpeakNGSwift", from: "1.0.1"),
-    .package(url: "https://github.com/NooronSpatial/MisakiSwift", from: "1.1.0"),
+    .package(url: "https://github.com/NooronSpatial/MisakiSwift", from: "1.1.1"),
     .package(url: "https://github.com/mlalma/MLXUtilsLibrary.git", exact: "0.0.6")
   ],
   targets: [

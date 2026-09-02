@@ -1,7 +1,7 @@
 > ## Why this fork exists
 >
 > This is a fork of [mlalma/kokoro-ios](https://github.com/mlalma/kokoro-ios)
-> with **two lines changed**, so that Kokoro can run in the same Swift package
+> with **three lines changed**, so that Kokoro can run in the same Swift package
 > graph as a model that needs a newer MLX.
 >
 > ```diff
@@ -29,6 +29,24 @@
 > zero errors and zero warnings**, with the pin as the only variable changed.
 > Compilation is not proof of numerical equivalence, and runtime behaviour on
 > device is checked separately.
+>
+> **The third line: the library is no longer `type: .dynamic`.** Upstream
+> ships KokoroSwift as a dynamic framework. In an app that ALSO links MLX
+> statically (through `mlx-swift-lm`), that puts `MLXNN` into the process
+> twice — once inside the framework, once in the app binary — and the
+> Objective-C runtime logs sixty warnings of the form *"Class MLXNN.Linear
+> is implemented in both … This may cause spurious casting failures and
+> mysterious crashes."* Static linking removes the second copy; the matching
+> MisakiSwift fork makes the same change, and both were verified by
+> inspecting the built app bundle before being pushed.
+>
+> ```diff
+>   .library(
+>     name: "KokoroSwift",
+> -   type: .dynamic,
+>     targets: ["KokoroSwift"]
+>   ),
+> ```
 >
 > Nothing else is modified. Fixes belong upstream; if upstream relaxes the
 > pin, this fork should be deleted rather than maintained.
