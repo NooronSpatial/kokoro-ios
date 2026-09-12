@@ -33,7 +33,12 @@ let package = Package(
         .product(name: "MLXUtilsLibrary", package: "MLXUtilsLibrary")
       ],
       resources: [
-       .copy("../../Resources/")
+        // The FILE, not the folder. Copying the folder put a `Resources/`
+        // directory at the bundle's root, and the iOS Simulator's ad-hoc
+        // code signing rejects that layout ("bundle format unrecognized") —
+        // a device build never signs the bare bundle, so it never noticed.
+        // A flat bundle signs everywhere and changes nothing on the phone.
+        .copy("../../Resources/config.json")
       ]
     ),
     .testTarget(
