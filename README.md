@@ -1,3 +1,58 @@
+> ## Why this fork exists
+>
+> This is a fork of [mlalma/kokoro-ios](https://github.com/mlalma/kokoro-ios)
+> with **three lines changed**, so that Kokoro can run in the same Swift package
+> graph as a model that needs a newer MLX.
+>
+> ```diff
+> - .package(url: ".../mlx-swift", exact: "0.30.2"),
+> + .package(url: ".../mlx-swift", from: "0.30.2"),
+> ```
+>
+> Upstream pins `mlx-swift` to **exactly 0.30.2**. `mlx-swift-lm` (used for
+> on-device language models) requires **0.31.3..<0.32.0**, so SwiftPM refuses
+> any graph containing both.
+>
+> There is no partial route: `MisakiSwift` carries the same pin, so the G2P
+> drags 0.30.2 back in on its own. That is the **second** changed line — this
+> package now points at
+> [NooronSpatial/MisakiSwift](https://github.com/NooronSpatial/MisakiSwift),
+> the matching fork:
+>
+> ```diff
+> - .package(url: "https://github.com/mlalma/MisakiSwift", exact: "1.0.6"),
+> + .package(url: "https://github.com/NooronSpatial/MisakiSwift", from: "1.1.0"),
+> ```
+>
+> The relaxed range was verified before this fork was made: KokoroSwift,
+> MisakiSwift and MLXUtilsLibrary all build against **mlx-swift 0.31.6 with
+> zero errors and zero warnings**, with the pin as the only variable changed.
+> Compilation is not proof of numerical equivalence, and runtime behaviour on
+> device is checked separately.
+>
+> **The third line: the library is no longer `type: .dynamic`.** Upstream
+> ships KokoroSwift as a dynamic framework. In an app that ALSO links MLX
+> statically (through `mlx-swift-lm`), that puts `MLXNN` into the process
+> twice — once inside the framework, once in the app binary — and the
+> Objective-C runtime logs sixty warnings of the form *"Class MLXNN.Linear
+> is implemented in both … This may cause spurious casting failures and
+> mysterious crashes."* Static linking removes the second copy; the matching
+> MisakiSwift fork makes the same change, and both were verified by
+> inspecting the built app bundle before being pushed.
+>
+> ```diff
+>   .library(
+>     name: "KokoroSwift",
+> -   type: .dynamic,
+>     targets: ["KokoroSwift"]
+>   ),
+> ```
+>
+> Nothing else is modified. Fixes belong upstream; if upstream relaxes the
+> pin, this fork should be deleted rather than maintained.
+>
+> ---
+>
 # Kokoro TTS for Swift
 
 ✨ *New in 1.0.8:* Added timestamps for each token. Please check [Kokoro Test App](https://github.com/mlalma/KokoroTestApp) how to use them.
